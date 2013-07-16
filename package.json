@@ -3,6 +3,15 @@
     "version": "0.0.1",
     "description": "Run and dispatch events to Hoodie plugin server extensions",
     "dependencies": {
-        "hoodie-plugins-api": "git://github.com/hoodiehq/hoodie-plugins-api.git"
+        "hoodie-plugins-api": "git://github.com/hoodiehq/hoodie-plugins-api.git",
+        "couchr": "0.0.13",
+        "async": "0.2.9",
+        "underscore": "1.5.1"
+    },
+    "devDependencies": {
+        "multicouch": "latest",
+        "request": "2.22.0",
+        "mkdirp": "0.3.5",
+        "rimraf": "2.2.1"
     }
 }
