@@ -4,7 +4,7 @@
     "description": "Run and dispatch events to Hoodie plugin server extensions",
     "dependencies": {
         "hoodie-plugins-api": "git://github.com/hoodiehq/hoodie-plugins-api.git",
-        "couchr": "0.0.13",
+        "couchr": "0.0.14",
         "async": "0.2.9",
         "underscore": "1.5.1"
     },
