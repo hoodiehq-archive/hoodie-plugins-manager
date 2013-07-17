@@ -96,3 +96,34 @@ exports['automatically update plugin config'] = function (test) {
         }, 200);
     });
 };
+
+exports['automatically update app config'] = function (test) {
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie = manager.createAPI({name: 'myplugin'});
+
+        test.equal(hoodie.config.get('foo'), 'bar');
+
+        var url = hoodie._resolve('app/config');
+        setTimeout(function () {
+            couchr.get(url, function (err, doc) {
+                if (err) {
+                    return test.done(err);
+                }
+                doc.config.foo = 'wibble';
+                couchr.put(url, doc, function (err) {
+                    if (err) {
+                        return test.done(err);
+                    }
+                    // test that couchdb change event causes config to update
+                    setTimeout(function () {
+                        test.equal(hoodie.config.get('foo'), 'wibble');
+                        manager.stop(test.done);
+                    }, 200);
+                });
+            });
+        }, 200);
+    });
+};
