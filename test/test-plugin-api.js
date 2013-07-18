@@ -127,3 +127,132 @@ exports['automatically update app config'] = function (test) {
         }, 200);
     });
 };
+
+exports['trigger account events in plugins'] = function (test) {
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie = manager.createAPI({name: 'myplugin'});
+
+        var evs = [];
+        function pushEv(name) {
+            return function (change) {
+                if (change.deleted) {
+                    evs.push(name + ' deleted');
+                }
+                else {
+                    evs.push(name + ' ' + change.doc.name);
+                }
+            };
+        }
+        function recEvent(name) {
+            hoodie.account.on(name, pushEv(name));
+        }
+        /*
+        recEvent('add');
+        recEvent('add:user');
+        recEvent('add:other');
+        recEvent('remove');
+        recEvent('remove:user');
+        recEvent('remove:other');
+        recEvent('update');
+        recEvent('update:user');
+        recEvent('update:other');
+        */
+        recEvent('change');
+        recEvent('change:user');
+        recEvent('change:other');
+
+        var doc = {name: 'foo', password: 'secret'};
+        async.series([
+            async.apply(hoodie.account.add, 'user', doc),
+            async.apply(hoodie.account.update, 'user', 'foo', {asdf: 123}),
+            async.apply(hoodie.account.remove, 'user', 'foo')
+        ],
+        function (err) {
+            if (err) {
+                return test.done(err);
+            }
+            setTimeout(function () {
+                test.same(evs, [
+                    //'add foo',
+                    'change foo',
+                    //'add:user foo',
+                    'change:user foo',
+                    //'update foo',
+                    'change foo',
+                    //'update:user foo',
+                    'change:user foo',
+                    //'remove foo',
+                    //'remove:user foo',
+                    'change deleted'
+                ]);
+                test.done();
+            }, 200);
+        });
+    });
+};
+
+/*
+exports['trigger task events in plugins'] = function (test) {
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie = manager.createAPI({name: 'myplugin'});
+
+        var tasklist = [];
+        function recEvent(name) {
+            hoodie.task.on(name, function (doc) {
+                tasklist.push(name + ' ' + doc.name);
+            });
+        }
+        recEvent('add');
+        recEvent('add:mytask');
+        recEvent('add:other');
+        recEvent('update');
+        recEvent('update:mytask');
+        recEvent('update:other');
+        recEvent('remove');
+        recEvent('remove:mytask');
+        recEvent('remove:other');
+        recEvent('change');
+        recEvent('change:mytask');
+        recEvent('change:other');
+
+        hoodie.database.add('foo', function (err) {
+            if (err) {
+                return test.done(err);
+            }
+            var doc = {id: 'asdf', name: 'test'};
+            var db = hoodie.database('foo');
+            async.series([
+                async.apply(db.add, '$mytask', doc),
+                async.apply(db.update, '$mytask', 'asdf', {foo: 'bar'}),
+                async.apply(db.remove, '$mytask', 'asdf')
+            ],
+            function (err) {
+                if (err) {
+                    return test.done(err);
+                }
+                test.same(tasklist, [
+                    'add test',
+                    'change test',
+                    'add:mytask test',
+                    'change:mytask test',
+                    'update test',
+                    'change test',
+                    'update:mytask test',
+                    'change:mytask test',
+                    'remove test',
+                    'change test',
+                    'remove:mytask test',
+                    'chnage:mytask test'
+                ]);
+                test.done();
+            });
+        });
+    });
+};
+*/
