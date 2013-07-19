@@ -149,17 +149,6 @@ exports['trigger account events in plugins'] = function (test) {
         function recEvent(name) {
             hoodie.account.on(name, pushEv(name));
         }
-        /*
-        recEvent('add');
-        recEvent('add:user');
-        recEvent('add:other');
-        recEvent('remove');
-        recEvent('remove:user');
-        recEvent('remove:other');
-        recEvent('update');
-        recEvent('update:user');
-        recEvent('update:other');
-        */
         recEvent('change');
         recEvent('change:user');
         recEvent('change:other');
@@ -194,7 +183,6 @@ exports['trigger account events in plugins'] = function (test) {
     });
 };
 
-/*
 exports['trigger task events in plugins'] = function (test) {
     plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
         if (err) {
@@ -204,31 +192,29 @@ exports['trigger task events in plugins'] = function (test) {
 
         var tasklist = [];
         function recEvent(name) {
-            hoodie.task.on(name, function (doc) {
-                tasklist.push(name + ' ' + doc.name);
+            hoodie.task.on(name, function (db, change) {
+                if (change.deleted) {
+                    tasklist.push(name + ' deleted');
+                }
+                else {
+                    tasklist.push(name + ' ' + change.doc.name);
+                }
             });
         }
-        recEvent('add');
-        recEvent('add:mytask');
-        recEvent('add:other');
-        recEvent('update');
-        recEvent('update:mytask');
-        recEvent('update:other');
-        recEvent('remove');
-        recEvent('remove:mytask');
-        recEvent('remove:other');
         recEvent('change');
-        recEvent('change:mytask');
-        recEvent('change:other');
+        recEvent('change:$mytask');
+        recEvent('change:$other');
 
         hoodie.database.add('foo', function (err) {
             if (err) {
                 return test.done(err);
             }
+            hoodie.task.addSource('foo');
             var doc = {id: 'asdf', name: 'test'};
             var db = hoodie.database('foo');
             async.series([
                 async.apply(db.add, '$mytask', doc),
+                async.apply(db.add, 'notatask', doc),
                 async.apply(db.update, '$mytask', 'asdf', {foo: 'bar'}),
                 async.apply(db.remove, '$mytask', 'asdf')
             ],
@@ -236,23 +222,28 @@ exports['trigger task events in plugins'] = function (test) {
                 if (err) {
                     return test.done(err);
                 }
-                test.same(tasklist, [
-                    'add test',
-                    'change test',
-                    'add:mytask test',
-                    'change:mytask test',
-                    'update test',
-                    'change test',
-                    'update:mytask test',
-                    'change:mytask test',
-                    'remove test',
-                    'change test',
-                    'remove:mytask test',
-                    'chnage:mytask test'
-                ]);
-                test.done();
+                // give it time to return in _changes feed
+                setTimeout(function () {
+                    test.same(tasklist, [
+                        'change test',
+                        'change:$mytask test',
+                        'change test',
+                        'change:$mytask test',
+                        'change deleted',
+                        'change:$mytask deleted'
+                    ]);
+                    // task events should no longer fire from this db
+                    hoodie.task.removeSource('foo');
+                    tasklist = [];
+                    db.add('$othertask', doc, function () {
+                        // give it time to return in _changes feed
+                        setTimeout(function () {
+                            test.same(tasklist, []);
+                            test.done();
+                        }, 200);
+                    });
+                }, 200);
             });
         });
     });
 };
-*/
