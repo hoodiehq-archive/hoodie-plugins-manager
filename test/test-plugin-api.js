@@ -349,7 +349,7 @@ exports['trigger task events in plugins'] = function (test) {
                         // give it time to return in _changes feed
                         setTimeout(function () {
                             test.same(tasklist, []);
-                            test.done();
+                            manager.stop(test.done);
                         }, 200);
                     });
                 }, 200);
