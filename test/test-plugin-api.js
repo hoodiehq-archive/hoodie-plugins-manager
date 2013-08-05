@@ -263,7 +263,7 @@ exports['trigger account events in plugins'] = function (test) {
         recEvent('change:user');
         recEvent('change:other');
 
-        var doc = {name: 'foo', password: 'secret'};
+        var doc = {id: 'foo', password: 'secret'};
         async.series([
             async.apply(hoodie.account.add, 'user', doc),
             async.apply(hoodie.account.update, 'user', 'foo', {asdf: 123}),
@@ -275,19 +275,14 @@ exports['trigger account events in plugins'] = function (test) {
             }
             setTimeout(function () {
                 test.same(evs, [
-                    //'add foo',
-                    'change foo',
-                    //'add:user foo',
-                    'change:user foo',
-                    //'update foo',
-                    'change foo',
-                    //'update:user foo',
-                    'change:user foo',
-                    //'remove foo',
-                    //'remove:user foo',
-                    'change deleted'
+                    'change user/foo',
+                    'change:user user/foo',
+                    'change user/foo',
+                    'change:user user/foo',
+                    'change deleted',
+                    'change:user deleted'
                 ]);
-                test.done();
+                manager.stop(test.done);
             }, 200);
         });
     });
@@ -328,7 +323,7 @@ exports['trigger task events in plugins'] = function (test) {
                 async.apply(db.update, '$mytask', 'asdf', {foo: 'bar'}),
                 async.apply(db.remove, '$mytask', 'asdf')
             ],
-            function (err) {
+            function (err, results) {
                 if (err) {
                     return test.done(err);
                 }
