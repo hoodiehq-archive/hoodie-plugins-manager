@@ -1,11 +1,12 @@
 var plugins_manager = require('../lib/index'),
+    nodemailer = require('nodemailer'),
     couchr = require('couchr'),
     utils = require('./lib/utils'),
     async = require('async'),
     url = require('url'),
     _ = require('underscore');
 
-//require('long-stack-traces');
+require('long-stack-traces');
 
 
 var COUCH = {
@@ -34,7 +35,15 @@ exports.setUp = function (callback) {
         that.base_url = base;
 
         var appconfig = {
-            config: {foo: 'bar'}
+            config: {
+                foo: 'bar',
+                email_host: 'emailhost',
+                email_port: 465,
+                email_user: 'gmail.user@gmail.com',
+                email_pass: 'userpass',
+                email_secure: true,
+                email_service: 'Gmail'
+            }
         };
         async.series([
             async.apply(couchr.put, url.resolve(base, 'plugins')),
@@ -48,6 +57,107 @@ exports.setUp = function (callback) {
 exports.tearDown = function (callback) {
     this.couch.once('stop', callback);
     this.couch.stop();
+};
+
+exports['sendEmail'] = function (test) {
+    test.expect(5);
+    var email = {
+        to: 'to@hood.ie',
+        from: 'from@hood.ie',
+        subject: 'subject',
+        text: 'blah blah',
+    };
+    var createTransport_calls = [];
+    var sendMail_calls = [];
+    var close_calls = [];
+
+    var _createTransport = nodemailer.createTransport;
+    nodemailer.createTransport = function (type, config) {
+        test.equal(type, 'SMTP');
+        createTransport_calls.push(config);
+        return {
+            close: function (callback) {
+                close_calls.push(config);
+                if (callback) {
+                    callback();
+                }
+            },
+            sendMail: function (opt, callback) {
+                sendMail_calls.push(opt);
+                callback();
+            }
+        };
+    };
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie = manager.createAPI({name: 'myplugin'});
+        hoodie.sendEmail(email, function (err) {
+            var appcfg = {
+                foo: 'bar',
+                email_host: 'emailhost2',
+                email_port: 123,
+                email_user: 'gmail.user2@gmail.com',
+                email_pass: 'userpass2',
+                email_secure: false,
+                email_service: 'Gmail2'
+            };
+            var url = hoodie._resolve('app/config');
+            couchr.get(url, function (err, doc) {
+                if (err) {
+                    return test.done(err);
+                }
+                doc.config = appcfg;
+                couchr.put(url, doc, function (err) {
+                    if (err) {
+                        return test.done(err);
+                    }
+                    setTimeout(function () {
+                        hoodie.sendEmail(email, function (err) {
+                            test.same(createTransport_calls, [
+                                {
+                                    host: 'emailhost',
+                                    port: 465,
+                                    auth: {
+                                        user: 'gmail.user@gmail.com',
+                                        pass: 'userpass'
+                                    },
+                                    secureConnection: true,
+                                    service: 'Gmail'
+                                },
+                                {
+                                    host: 'emailhost2',
+                                    port: 123,
+                                    auth: {
+                                        user: 'gmail.user2@gmail.com',
+                                        pass: 'userpass2'
+                                    },
+                                    secureConnection: false,
+                                    service: 'Gmail2'
+                                }
+                            ]);
+                            test.same(close_calls, [
+                                {
+                                    host: 'emailhost',
+                                    port: 465,
+                                    auth: {
+                                        user: 'gmail.user@gmail.com',
+                                        pass: 'userpass'
+                                    },
+                                    secureConnection: true,
+                                    service: 'Gmail'
+                                }
+                            ]);
+                            test.same(sendMail_calls, [email, email]);
+                            nodemailer.createTransport = _createTransport;
+                            manager.stop(test.done);
+                        });
+                    }, 100);
+                });
+            });
+        });
+    });
 };
 
 exports['get config values from plugin manager'] = function (test) {

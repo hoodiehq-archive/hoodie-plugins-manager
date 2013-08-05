@@ -6,7 +6,8 @@
         "hoodie-plugins-api": "git://github.com/hoodiehq/hoodie-plugins-api.git",
         "couchr": "0.0.14",
         "async": "0.2.9",
-        "underscore": "1.5.1"
+        "underscore": "1.5.1",
+        "nodemailer": "0.5.2"
     },
     "devDependencies": {
         "multicouch": "latest",
