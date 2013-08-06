@@ -7,28 +7,50 @@ var MultiCouch = require('multicouch'),
     urlParse = require('url').parse;
 
 
-exports.setupCouch = function (opts, callback) {
-    var cmd = 'pkill -fu ' + process.env.LOGNAME + ' ' + opts.data_dir;
+exports.killCouch = function (opts, callback) {
+    var cmd = 'pkill -f ' + opts.data_dir;
     var pkill = child_process.exec(cmd, function (err, stdout, stderr) {
         // ignore errors from pkill
-        async.series([
-            async.apply(rimraf, opts.data_dir),
-            async.apply(mkdirp, opts.data_dir),
-            async.apply(startCouch, opts),
-            async.apply(createAdmin, opts)
-        ],
-        function (err, results) {
-            if (err) {
-                return callback(err);
-            }
-            process.on('exit', function (code) {
-                couch.once('stop', function () {
-                    process.exit(code);
-                });
-                couch.stop();
-            });
-            callback(null, couch);
+        callback();
+    });
+};
+
+exports.stopCouch = function (opts, couch, callback) {
+    // kill after timeout
+    var t = setTimeout(function () {
+        exports.killCouch(opts, function () {
+            var _cb = callback;
+            callback = function () {};
+            _cb();
         });
+    }, 2000);
+    // try to stop normally first
+    couch.once('stop', function () {
+        clearTimeout(t);
+        callback();
+    });
+    couch.stop();
+};
+
+exports.setupCouch = function (opts, callback) {
+    async.series([
+        async.apply(exports.killCouch, opts),
+        async.apply(rimraf, opts.data_dir),
+        async.apply(mkdirp, opts.data_dir),
+        async.apply(startCouch, opts),
+        async.apply(createAdmin, opts)
+    ],
+    function (err, results) {
+        if (err) {
+            return callback(err);
+        }
+        process.on('exit', function (code) {
+            couch.once('stop', function () {
+                process.exit(code);
+            });
+            couch.stop();
+        });
+        callback(null, couch);
     });
 }
 

@@ -55,8 +55,7 @@ exports.setUp = function (callback) {
 };
 
 exports.tearDown = function (callback) {
-    this.couch.once('stop', callback);
-    this.couch.stop();
+    utils.stopCouch(COUCH, this.couch, callback);
 };
 
 exports['sendEmail'] = function (test) {
@@ -247,12 +246,12 @@ exports['trigger account events in plugins'] = function (test) {
 
         var evs = [];
         function pushEv(name) {
-            return function (change) {
-                if (change.deleted) {
+            return function (doc) {
+                if (doc._deleted) {
                     evs.push(name + ' deleted');
                 }
                 else {
-                    evs.push(name + ' ' + change.doc.name);
+                    evs.push(name + ' ' + doc.name);
                 }
             };
         }
@@ -297,18 +296,18 @@ exports['trigger task events in plugins'] = function (test) {
 
         var tasklist = [];
         function recEvent(name) {
-            hoodie.task.on(name, function (db, change) {
-                if (change.deleted) {
+            hoodie.task.on(name, function (db, doc) {
+                if (doc._deleted) {
                     tasklist.push(name + ' deleted');
                 }
                 else {
-                    tasklist.push(name + ' ' + change.doc.name);
+                    tasklist.push(name + ' ' + doc.name);
                 }
             });
         }
         recEvent('change');
-        recEvent('change:$mytask');
-        recEvent('change:$other');
+        recEvent('change:mytask');
+        recEvent('change:other');
 
         hoodie.database.add('foo', function (err) {
             if (err) {
@@ -331,11 +330,11 @@ exports['trigger task events in plugins'] = function (test) {
                 setTimeout(function () {
                     test.same(tasklist, [
                         'change test',
-                        'change:$mytask test',
+                        'change:mytask test',
                         'change test',
-                        'change:$mytask test',
+                        'change:mytask test',
                         'change deleted',
-                        'change:$mytask deleted'
+                        'change:mytask deleted'
                     ]);
                     // task events should no longer fire from this db
                     hoodie.task.removeSource('foo');
@@ -348,6 +347,42 @@ exports['trigger task events in plugins'] = function (test) {
                         }, 200);
                     });
                 }, 200);
+            });
+        });
+    });
+};
+
+exports['task add events'] = function (test) {
+    test.expect(8);
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie = manager.createAPI({name: 'myplugin'});
+        hoodie.task.on('add', function (dbname, task) {
+            test.equal(dbname, 'testdb');
+            test.equal(task.type, '$email');
+            test.equal(task.from, 'from');
+            test.equal(task.to, 'to');
+        });
+        hoodie.task.on('add:email', function (dbname, task) {
+            test.equal(dbname, 'testdb');
+            test.equal(task.type, '$email');
+            test.equal(task.from, 'from');
+            test.equal(task.to, 'to');
+            setImmediate(function () {
+                manager.stop(test.done);
+            });
+        });
+        hoodie.database.add('testdb', function (err, db) {
+            if (err) {
+                return test.done(err);
+            }
+            hoodie.task.addSource('testdb');
+            db.add('$email', {to: 'to', from: 'from'}, function (err) {
+                if (err) {
+                    return test.done(err);
+                }
             });
         });
     });
