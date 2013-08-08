@@ -370,8 +370,15 @@ exports['task add events'] = function (test) {
             test.equal(task.type, '$email');
             test.equal(task.from, 'from');
             test.equal(task.to, 'to');
-            setImmediate(function () {
-                manager.stop(test.done);
+
+            hoodie.task.success(dbname, task, function (err) {
+                if (err) {
+                    return test.done(err);
+                }
+                // give events from the finish call time to fire
+                setTimeout(function () {
+                    manager.stop(test.done);
+                }, 200);
             });
         });
         hoodie.database.add('testdb', function (err, db) {
