@@ -58,6 +58,55 @@ exports.tearDown = function (callback) {
     utils.stopCouch(COUCH, this.couch, callback);
 };
 
+exports['changed docs passed to plugins can be modified'] = function (test) {
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var hoodie1 = manager.createAPI({name: 'myplugin1'});
+        var hoodie2 = manager.createAPI({name: 'myplugin2'});
+
+        hoodie1.account.on('change', function (doc) {
+            test.ok(!doc.processed_by);
+            doc.processed_by = 1;
+        });
+        hoodie2.account.on('change', function (doc) {
+            test.ok(!doc.processed_by);
+            doc.processed_by = 2;
+        });
+        hoodie1.task.on('change', function (db, doc) {
+            test.ok(!doc.processed_by);
+            doc.processed_by = 1;
+        });
+        hoodie2.task.on('change', function (db, doc) {
+            test.ok(!doc.processed_by);
+            doc.processed_by = 2;
+        });
+
+        hoodie1.database.add('foo', function (err) {
+            if (err) {
+                return test.done(err);
+            }
+            hoodie1.task.addSource('foo');
+            var task_doc = {id: 'asdf', name: 'test'};
+            var user_doc = {id: 'foo', password: 'secret'};
+            var db = hoodie1.database('foo');
+            async.series([
+                async.apply(hoodie1.account.add, 'user', user_doc),
+                async.apply(db.add, '$mytask', task_doc)
+            ],
+            function (err, results) {
+                if (err) {
+                    return test.done(err);
+                }
+                setTimeout(function () {
+                    manager.stop(test.done);
+                }, 200);
+            });
+        });
+    });
+};
+
 exports['sendEmail'] = function (test) {
     test.expect(5);
     var email = {
