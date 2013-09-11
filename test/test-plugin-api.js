@@ -358,13 +358,13 @@ exports['trigger task events in plugins'] = function (test) {
         recEvent('change:mytask');
         recEvent('change:other');
 
-        hoodie.database.add('foo', function (err) {
+        hoodie.database.add('user/foo', function (err) {
             if (err) {
                 return test.done(err);
             }
-            hoodie.task.addSource('foo');
+            hoodie.task.addSource('user/foo');
             var doc = {id: 'asdf', name: 'test'};
-            var db = hoodie.database('foo');
+            var db = hoodie.database('user/foo');
             async.series([
                 async.apply(db.add, '$mytask', doc),
                 async.apply(db.add, 'notatask', doc),
@@ -386,7 +386,7 @@ exports['trigger task events in plugins'] = function (test) {
                         'change:mytask deleted'
                     ]);
                     // task events should no longer fire from this db
-                    hoodie.task.removeSource('foo');
+                    hoodie.task.removeSource('user/foo');
                     tasklist = [];
                     db.add('$othertask', doc, function () {
                         // give it time to return in _changes feed
