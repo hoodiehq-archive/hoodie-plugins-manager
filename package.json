@@ -1,6 +1,6 @@
 {
     "name": "hoodie-plugins-manager",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Run and dispatch events to Hoodie plugin server extensions",
     "dependencies": {
         "hoodie-plugins-api": "git://github.com/hoodiehq/hoodie-plugins-api.git",
