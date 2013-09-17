@@ -3,7 +3,7 @@
     "version": "0.0.3",
     "description": "Run and dispatch events to Hoodie plugin server extensions",
     "dependencies": {
-        "hoodie-plugins-api": "0.0.2",
+        "hoodie-plugins-api": "0.0.3",
         "couchr": "0.0.14",
         "async": "0.2.9",
         "underscore": "1.5.1",
