@@ -4,16 +4,18 @@ var plugins_manager = require('../lib/index'),
     utils = require('./lib/utils'),
     async = require('async'),
     url = require('url'),
+    urlFormat = url.format,
+    urlParse = url.parse,
     _ = require('underscore');
 
-require('long-stack-traces');
+//require('long-stack-traces');
 
 
 var COUCH = {
     user: 'admin',
     pass: 'password',
     url: 'http://localhost:8985',
-    data_dir: __dirname + '/data',
+    data_dir: __dirname + '/data'
 };
 
 var DEFAULT_OPTIONS = {
@@ -107,13 +109,13 @@ exports['changed docs passed to plugins can be modified'] = function (test) {
     });
 };
 
-exports['sendEmail'] = function (test) {
+exports['sendEmail function'] = function (test) {
     test.expect(5);
     var email = {
         to: 'to@hood.ie',
         from: 'from@hood.ie',
         subject: 'subject',
-        text: 'blah blah',
+        text: 'blah blah'
     };
     var createTransport_calls = [];
     var sendMail_calls = [];
@@ -439,6 +441,81 @@ exports['task add events'] = function (test) {
                 if (err) {
                     return test.done(err);
                 }
+            });
+        });
+    });
+};
+
+exports['unprocessed tasks should be handled on addSource'] = function (test) {
+    var couchdb = DEFAULT_OPTIONS.couchdb;
+    var dburl = urlParse(couchdb.url + '/testdb');
+    dburl.auth = couchdb.user + ':' + couchdb.pass;
+    dburl = urlFormat(dburl);
+
+    couchr.put(dburl, {name: 'testdb'}, function (err) {
+        if (err) {
+            return test.done(err);
+        }
+        var names = ['foo', 'bar', 'baz'];
+        async.map(names, function (name, cb) {
+            var doc = {
+                _id: '$example/' + name,
+                type: '$example',
+                name: name
+            };
+            couchr.post(dburl, doc, cb);
+        },
+        function (err) {
+            if (err) {
+                return test.done(err);
+            }
+            async.parallel([
+                function (cb) {
+                    // add a processed doc
+                    couchr.post(dburl, {
+                        _id: '$example/qux',
+                        type: '$example',
+                        name: 'qux',
+                        $processedAt: 'now',
+                        _deleted: true
+                    }, cb);
+                },
+                function (cb) {
+                    // add a processed doc
+                    couchr.post(dburl, {
+                        _id: '$example/quux',
+                        type: '$example',
+                        name: 'quux',
+                        $error: 'stuff broke'
+                    }, cb);
+                }
+            ],
+            function (err) {
+                if (err) {
+                    return test.done(err);
+                }
+                plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+                    if (err) {
+                        test.done(err);
+                    }
+                    var hoodie = manager.createAPI({name: 'myplugin'});
+                    hoodie.task.addSource('testdb');
+                    var added_tasks = [];
+                    var changed_tasks = [];
+                    hoodie.task.on('add:example', function (db, task) {
+                        added_tasks.push(task.name);
+                    });
+                    hoodie.task.on('change:example', function (db, task) {
+                        changed_tasks.push(task.name);
+                    });
+                    setTimeout(function (err) {
+                        test.same(added_tasks.sort(), ['bar', 'baz', 'foo']);
+                        test.same(changed_tasks.sort(), [
+                            'bar', 'baz', 'foo', 'quux'
+                        ]);
+                        manager.stop(test.done);
+                    }, 200);
+                });
             });
         });
     });
