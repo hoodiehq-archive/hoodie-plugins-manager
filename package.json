@@ -1,13 +1,14 @@
 {
     "name": "hoodie-plugins-manager",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Run and dispatch events to Hoodie plugin server extensions",
     "dependencies": {
         "hoodie-plugins-api": "0.0.4",
         "couchr": "0.0.14",
         "async": "0.2.9",
         "underscore": "1.5.1",
-        "nodemailer": "0.5.2"
+        "nodemailer": "0.5.2",
+        "dataurl": "0.1.0"
     },
     "devDependencies": {
         "multicouch": "latest",
