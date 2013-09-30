@@ -446,6 +446,61 @@ exports['task add events'] = function (test) {
     });
 };
 
+exports['#1 multiple addSource calls'] = function (test) {
+    test.expect(9);
+    plugins_manager.start(DEFAULT_OPTIONS, function (err, manager) {
+        if (err) {
+            return test.done(err);
+        }
+        var add_calls = 0;
+        var hoodie = manager.createAPI({name: 'myplugin'});
+        hoodie.task.on('add', function (dbname, task) {
+            add_calls++;
+            test.equal(dbname, 'testdb');
+            test.equal(task.type, '$email');
+            test.equal(task.from, 'from');
+            test.equal(task.to, 'to');
+        });
+        hoodie.task.on('add:email', function (dbname, task) {
+            test.equal(dbname, 'testdb');
+            test.equal(task.type, '$email');
+            test.equal(task.from, 'from');
+            test.equal(task.to, 'to');
+
+            hoodie.task.success(dbname, task, function (err) {
+                if (err) {
+                    return test.done(err);
+                }
+                test.equal(add_calls, 1);
+                // give events from the finish call time to fire
+                setTimeout(function () {
+                    manager.stop(test.done);
+                }, 200);
+            });
+        });
+        hoodie.database.add('testdb', function (err, db) {
+            if (err) {
+                return test.done(err);
+            }
+            async.series([
+                async.apply(hoodie.task.addSource, 'testdb'),
+                async.apply(hoodie.task.addSource, 'testdb'),
+                async.apply(hoodie.task.addSource, 'testdb')
+            ],
+            function (err) {
+                if (err) {
+                    return test.done(err);
+                }
+                db.add('$email', {to: 'to', from: 'from'}, function (err) {
+                    if (err) {
+                        return test.done(err);
+                    }
+                });
+            });
+        });
+    });
+};
+
 exports['unprocessed tasks should be handled on addSource'] = function (test) {
     var couchdb = DEFAULT_OPTIONS.couchdb;
     var dburl = urlParse(couchdb.url + '/testdb');
