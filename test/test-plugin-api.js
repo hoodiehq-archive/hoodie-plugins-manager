@@ -566,7 +566,7 @@ exports['unprocessed tasks should be handled on addSource'] = function (test) {
                     setTimeout(function (err) {
                         test.same(added_tasks.sort(), ['bar', 'baz', 'foo']);
                         test.same(changed_tasks.sort(), [
-                            'bar', 'baz', 'foo', 'quux'
+                            'bar', 'baz', 'foo', 'quux', 'qux'
                         ]);
                         manager.stop(test.done);
                     }, 200);

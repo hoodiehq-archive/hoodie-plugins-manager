@@ -60,8 +60,6 @@ function startCouch(opts, callback) {
     var couch_cfg = {
         port: urlParse(opts.url).port,
         prefix: opts.data_dir,
-        couchdb_path: '/usr/bin/couchdb',
-        default_sys_ini: '/etc/couchdb/default.ini',
         respawn: false // otherwise causes problems shutting down
     };
     // starts a local couchdb server using the Hoodie app's data dir
