@@ -310,8 +310,8 @@ exports['trigger account events in plugins'] = function (test) {
             hoodie.account.on(name, pushEv(name));
         }
         recEvent('change');
-        recEvent('change:user');
-        recEvent('change:other');
+        recEvent('user:change');
+        recEvent('other:change');
 
         var doc = {id: 'foo', password: 'secret'};
         async.series([
@@ -326,11 +326,11 @@ exports['trigger account events in plugins'] = function (test) {
             setTimeout(function () {
                 test.same(evs, [
                     'change user/foo',
-                    'change:user user/foo',
+                    'user:change user/foo',
                     'change user/foo',
-                    'change:user user/foo',
+                    'user:change user/foo',
                     'change deleted',
-                    'change:user deleted'
+                    'user:change deleted'
                 ]);
                 manager.stop(test.done);
             }, 200);
@@ -357,8 +357,8 @@ exports['trigger task events in plugins'] = function (test) {
             });
         }
         recEvent('change');
-        recEvent('change:mytask');
-        recEvent('change:other');
+        recEvent('mytask:change');
+        recEvent('other:change');
 
         hoodie.database.add('user/foo', function (err) {
             if (err) {
@@ -381,11 +381,11 @@ exports['trigger task events in plugins'] = function (test) {
                 setTimeout(function () {
                     test.same(tasklist, [
                         'change test',
-                        'change:mytask test',
+                        'mytask:change test',
                         'change test',
-                        'change:mytask test',
+                        'mytask:change test',
                         'change deleted',
-                        'change:mytask deleted'
+                        'mytask:change deleted'
                     ]);
                     // task events should no longer fire from this db
                     hoodie.task.removeSource('user/foo');
@@ -416,7 +416,7 @@ exports['task add events'] = function (test) {
             test.equal(task.from, 'from');
             test.equal(task.to, 'to');
         });
-        hoodie.task.on('add:email', function (dbname, task) {
+        hoodie.task.on('email:add', function (dbname, task) {
             test.equal(dbname, 'testdb');
             test.equal(task.type, '$email');
             test.equal(task.from, 'from');
@@ -461,7 +461,7 @@ exports['#1 multiple addSource calls'] = function (test) {
             test.equal(task.from, 'from');
             test.equal(task.to, 'to');
         });
-        hoodie.task.on('add:email', function (dbname, task) {
+        hoodie.task.on('email:add', function (dbname, task) {
             test.equal(dbname, 'testdb');
             test.equal(task.type, '$email');
             test.equal(task.from, 'from');
@@ -557,10 +557,10 @@ exports['unprocessed tasks should be handled on addSource'] = function (test) {
                     hoodie.task.addSource('testdb');
                     var added_tasks = [];
                     var changed_tasks = [];
-                    hoodie.task.on('add:example', function (db, task) {
+                    hoodie.task.on('example:add', function (db, task) {
                         added_tasks.push(task.name);
                     });
-                    hoodie.task.on('change:example', function (db, task) {
+                    hoodie.task.on('example:change', function (db, task) {
                         changed_tasks.push(task.name);
                     });
                     setTimeout(function (err) {
