@@ -1,24 +1,24 @@
 {
-    "name": "hoodie-plugins-manager",
-    "version": "0.1.2",
-    "description": "Run and dispatch events to Hoodie plugin server extensions",
-    "dependencies": {
-        "hoodie-plugins-api": "0.0.6",
-        "couchr": "0.0.14",
-        "async": "0.2.9",
-        "underscore": "1.5.1",
-        "nodemailer": "0.5.2",
-        "dataurl": "0.1.0"
-    },
-    "devDependencies": {
-        "multicouch": "0.8.1",
-        "request": "2.22.0",
-        "mkdirp": "0.3.5",
-        "rimraf": "2.2.1",
-        "nodeunit": "0.8.1"
-    },
-    "main": "lib/index.js",
-    "scripts": {
-        "test": "node_modules/.bin/nodeunit test"
-    }
+  "name": "hoodie-plugins-manager",
+  "version": "0.1.3",
+  "description": "Run and dispatch events to Hoodie plugin server extensions",
+  "dependencies": {
+    "hoodie-plugins-api": "0.0.6",
+    "couchr": "0.0.14",
+    "async": "0.2.9",
+    "underscore": "1.5.1",
+    "nodemailer": "0.5.2",
+    "dataurl": "0.1.0"
+  },
+  "devDependencies": {
+    "multicouch": "0.8.1",
+    "request": "2.22.0",
+    "mkdirp": "0.3.5",
+    "rimraf": "2.2.1",
+    "nodeunit": "0.8.1"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "node_modules/.bin/nodeunit test"
+  }
 }
