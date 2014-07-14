@@ -148,8 +148,6 @@ exports['sendEmail function'] = function (test) {
                 foo: 'bar',
                 email_host: 'emailhost2',
                 email_port: 123,
-                email_user: 'gmail.user2@gmail.com',
-                email_pass: 'userpass2',
                 email_secure: false,
                 email_service: 'Gmail2'
             };
@@ -179,10 +177,6 @@ exports['sendEmail function'] = function (test) {
                                 {
                                     host: 'emailhost2',
                                     port: 123,
-                                    auth: {
-                                        user: 'gmail.user2@gmail.com',
-                                        pass: 'userpass2'
-                                    },
                                     secureConnection: false,
                                     service: 'Gmail2'
                                 }
