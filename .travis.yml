@@ -1,0 +1,20 @@
+before_install:
+- npm install -g grunt-cli
+after_success:
+- grunt ghrelease
+language: node_js
+node_js:
+- '0.10'
+notifications:
+  email: false
+env:
+  global:
+    secure: H5Y1d5Uts9z6KOqOLoH/trq0ethnShB5PyxTGwZQb+7G5qFZdnq20aDghpXndIqzsf5Wfk14igSPaWMSJPonHKd3DHkCXBTu75WnxEu2IFPSx1McZZzHbFpLPWHkW8EeVS8mjPq8JdYIURMrVdPFWCjrlLm51tihZ7/yK6FktGY=
+deploy:
+  provider: npm
+  email: stephan@thehoodiefirm.com
+  api_key:
+    secure: Jk8+jqNiOrWC2LmigaNRH5DbVijqRFb1fbAoOZ8j/wVQuVV0C2sRJewVfZwcZiQkNiGyVKkhA0g3v6ENbrcvx9GPS3v57/00X3lQUdc/CahKUP7edG2uDahYuLzz/5RCXZHRcZ0kLbQGaYGJw853C1U5d7v4p054tAuNiF1Gx6U=
+  on:
+    all_branches: true
+    tags: true
