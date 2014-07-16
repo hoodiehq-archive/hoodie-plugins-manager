@@ -1,5 +1,7 @@
 # Hoodie Plugins Manager
 [![Build Status](https://travis-ci.org/hoodiehq/hoodie-plugins-manager.svg)](https://travis-ci.org/hoodiehq/hoodie-plugins-manager)
+[![Dependency Status](https://david-dm.org/hoodiehq/hoodie-plugins-manager.svg)](https://david-dm.org/hoodiehq/hoodie-plugins-manager)
+[![devDependency Status](https://david-dm.org/hoodiehq/hoodie-plugins-manager/dev-status.svg)](https://david-dm.org/hoodiehq/hoodie-plugins-manager#info=devDependencies)
 
 This is a component of [hoodie-server](https://github.com/hoodiehq/hoodie-server) that manages Hoodie plugins.
 
