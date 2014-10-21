@@ -5,6 +5,8 @@ node_js:
 - '0.10'
 notifications:
   email: false
+  slack:
+    secure: RXHl1zz72dmE/EsFY9JfIaX+jVdZA/WJUWNngdivP4lHEZ1ZgXzpRKXScdFdiuyWrthn5KlFfECMV4CkIrysdBBGOIAGa7yj6RRZymLnsYvgNHxfrpPA4KDwS0+zxjzN1Csxb3urckRolRGcFFABbaJW60adeh5OC5Vzlr388FA=
 env:
   global:
   - secure: AMkHPJiDX13PGJWNrfQkM9VR/Rtx8qC3Zitg80R6SS263pxMJw7RwWI5lD4mr9kaFoi0YJjGD64ZVs+HIY+zIPELrxRmNUbwfJTYdHYCajlIzl/VdUlME1R0eS15GHnMqsLrwoictWUaqVWFYoKGFjLoJc1mGyQRRnClzUeu148=
