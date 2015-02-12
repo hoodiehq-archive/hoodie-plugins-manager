@@ -1,6 +1,6 @@
 {
   "name": "hoodie-plugins-manager",
-  "version": "0.2.6",
+  "version": "0.4.0",
   "description": "Run and dispatch events to Hoodie plugin server extensions",
   "dependencies": {
     "hoodie-plugins-api": "0.4.0",
@@ -22,5 +22,6 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "grunt ci"
-  }
+  },
+  "codename": "stellar-bison"
 }
