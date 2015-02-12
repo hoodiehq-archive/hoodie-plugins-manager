@@ -21,6 +21,6 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test": "node_modules/.bin/nodeunit test && grunt ci"
+    "test": "grunt ci"
   }
 }
