@@ -15,11 +15,11 @@
     "nodemailer": "0.5.2"
   },
   "devDependencies": {
-    "mkdirp": "0.3.5",
-    "multicouch": "0.8.1",
+    "mkdirp": "^0.5.1",
+    "multicouch": "^0.8.2",
     "nodeunit": "^0.9.1",
-    "request": "2.22.0",
-    "rimraf": "2.2.1"
+    "request": "^2.60.0",
+    "rimraf": "^2.4.2"
   },
   "homepage": "https://github.com/hoodiehq/hoodie-plugins-manager",
   "keywords": [
