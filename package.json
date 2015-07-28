@@ -1,7 +1,11 @@
 {
   "name": "hoodie-plugins-manager",
-  "version": "0.4.0",
   "description": "Run and dispatch events to Hoodie plugin server extensions",
+  "version": "0.4.0",
+  "author": "The Hoodie Community",
+  "bugs": {
+    "url": "https://github.com/hoodiehq/hoodie-plugins-manager/issues"
+  },
   "dependencies": {
     "async": "0.2.9",
     "couchr": "0.0.14",
@@ -17,9 +21,20 @@
     "request": "2.22.0",
     "rimraf": "2.2.1"
   },
+  "homepage": "https://github.com/hoodiehq/hoodie-plugins-manager",
+  "keywords": [
+    "backend",
+    "hoodie",
+    "plugin",
+    "server"
+  ],
+  "license": "Apache-2.0",
   "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hoodiehq/hoodie-plugins-manager.git"
+  },
   "scripts": {
     "test": "standard"
-  },
-  "codename": "stellar-bison"
+  }
 }
