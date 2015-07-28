@@ -19,7 +19,7 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test": "nodeunit test/test-*.js"
+    "test": "standard"
   },
   "codename": "stellar-bison"
 }
