@@ -3,12 +3,12 @@
   "version": "0.4.0",
   "description": "Run and dispatch events to Hoodie plugin server extensions",
   "dependencies": {
-    "hoodie-plugins-api": "0.4.0",
-    "couchr": "0.0.14",
     "async": "0.2.9",
-    "underscore": "1.5.1",
-    "nodemailer": "0.5.2",
-    "dataurl": "0.1.0"
+    "couchr": "0.0.14",
+    "dataurl": "0.1.0",
+    "hoodie-plugins-api": "0.4.0",
+    "lodash": "^3.10.0",
+    "nodemailer": "0.5.2"
   },
   "devDependencies": {
     "mkdirp": "0.3.5",
