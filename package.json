@@ -7,7 +7,7 @@
     "url": "https://github.com/hoodiehq/hoodie-plugins-manager/issues"
   },
   "dependencies": {
-    "async": "0.2.9",
+    "async": "^1.4.0",
     "couchr": "0.0.14",
     "dataurl": "0.1.0",
     "hoodie-plugins-api": "0.4.0",
