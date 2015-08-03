@@ -19,7 +19,9 @@
     "multicouch": "^0.8.2",
     "nodeunit": "^0.9.1",
     "request": "^2.60.0",
-    "rimraf": "^2.4.2"
+    "rimraf": "^2.4.2",
+    "snazzy": "^1.0.3",
+    "standard": "^4.5.4"
   },
   "homepage": "https://github.com/hoodiehq/hoodie-plugins-manager",
   "keywords": [
@@ -35,6 +37,6 @@
     "url": "https://github.com/hoodiehq/hoodie-plugins-manager.git"
   },
   "scripts": {
-    "test": "standard"
+    "test": "snazzy"
   }
 }
