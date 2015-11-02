@@ -18,12 +18,12 @@ test('sendEmail function', function (t) {
   var close_calls = []
 
   var _createTransport = nodemailer.createTransport
-  nodemailer.createTransport = function (type, config) {
-    t.equal(type, 'SMTP')
-    createTransport_calls.push(config)
+  nodemailer.createTransport = function (config) {
+    t.equal(config.name, 'SMTP')
+    createTransport_calls.push(config.options)
     return {
       close: function (callback) {
-        close_calls.push(config)
+        close_calls.push(config.options)
         if (callback) {
           callback()
         }
@@ -43,7 +43,7 @@ test('sendEmail function', function (t) {
         email_host: 'emailhost2',
         email_port: 123,
         email_secure: false,
-        email_service: 'Gmail2'
+        email_service: 'smtp'
       }
       var url = hoodie._resolve('app/config')
 
@@ -58,31 +58,31 @@ test('sendEmail function', function (t) {
               t.same(createTransport_calls, [
                 {
                   host: 'emailhost',
-                  port: 465,
                   auth: {
                     user: 'gmail.user@gmail.com',
                     pass: 'userpass'
                   },
-                  secureConnection: true,
-                  service: 'Gmail'
+                  port: 465,
+                  secure: true,
+                  name: '[127.0.0.1]'
                 },
                 {
                   host: 'emailhost2',
                   port: 123,
-                  secureConnection: false,
-                  service: 'Gmail2'
+                  secure: false,
+                  name: '[127.0.0.1]'
                 }
               ])
               t.same(close_calls, [
                 {
                   host: 'emailhost',
-                  port: 465,
                   auth: {
                     user: 'gmail.user@gmail.com',
                     pass: 'userpass'
                   },
-                  secureConnection: true,
-                  service: 'Gmail'
+                  port: 465,
+                  secure: true,
+                  name: '[127.0.0.1]'
                 }
               ])
               t.same(sendMail_calls, [email, email])

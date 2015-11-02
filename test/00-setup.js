@@ -31,7 +31,7 @@ test('database', function (t) {
       email_user: 'gmail.user@gmail.com',
       email_pass: 'userpass',
       email_secure: true,
-      email_service: 'Gmail'
+      email_service: 'smtp'
     }
   }
   async.series([

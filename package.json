@@ -12,7 +12,10 @@
     "dataurl": "0.1.0",
     "hoodie-plugins-api": "0.4.0",
     "lodash": "^3.10.0",
-    "nodemailer": "0.5.2"
+    "nodemailer": "^1.8.0",
+    "nodemailer-mandrill-transport": "^0.3.0",
+    "nodemailer-sendgrid-transport": "^0.2.0",
+    "nodemailer-smtp-transport": "^1.0.3"
   },
   "devDependencies": {
     "mkdirp": "^0.5.1",
